@@ -1,9 +1,8 @@
-import { IsNotEmpty, IsNumber, IsPositive, Length } from 'class-validator';
+import { IsNotEmpty, IsNumber, Length } from 'class-validator';
 
 export default class CreateUserDto {
   @IsNotEmpty()
   @IsNumber()
-  @IsPositive()
   public id: number;
 
   @IsNotEmpty()
