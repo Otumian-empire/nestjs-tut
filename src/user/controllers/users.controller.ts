@@ -3,15 +3,19 @@ import {
   Controller,
   Get,
   Param,
+  ParseBoolPipe,
+  ParseIntPipe,
   Post,
   Query,
   Req,
   Res,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
+
 import { Request, Response } from 'express';
-import ICreateUser, {
-  IReadUserById,
-} from '../interfaces/create_user.interface';
+import CreateUserDto from '../dtos/create_user.dto';
+import ReadUserByIdDto from '../dtos/read_user_by_id.dto';
 
 @Controller('users')
 export default class UsersController {
@@ -21,21 +25,27 @@ export default class UsersController {
   ];
 
   @Get()
+  @UsePipes(new ValidationPipe())
   getUsers(
     @Req() _req: Request,
-    @Query('reverse') reverse: boolean,
+    @Query('reverse', ParseBoolPipe) reverse: boolean,
     @Res() res: Response,
   ) {
     return res.send(reverse ? this.users.reverse() : this.users);
   }
 
   @Get(':id')
-  getUser(@Param('id') id: IReadUserById, @Res() res: Response) {
+  @UsePipes(new ValidationPipe())
+  getUser(
+    @Param('id', ParseIntPipe) id: ReadUserByIdDto,
+    @Res() res: Response,
+  ) {
     return res.json(this.users[Number(id)]);
   }
 
   @Post()
-  createUser(@Body() newUser: ICreateUser, @Res() res: Response) {
+  @UsePipes(new ValidationPipe())
+  createUser(@Body() newUser: CreateUserDto, @Res() res: Response) {
     this.users.push({
       id: newUser.id,
       username: newUser.username,

@@ -1,5 +1,12 @@
-import ICreateUser from '../interfaces/create_user.interface';
+import { IsNotEmpty, IsNumber, IsPositive, Length } from 'class-validator';
 
-export default class CreateUserDto implements ICreateUser {
-  constructor(public id: number, public username: string) {}
+export default class CreateUserDto {
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  public id: number;
+
+  @IsNotEmpty()
+  @Length(3)
+  public username: string;
 }
