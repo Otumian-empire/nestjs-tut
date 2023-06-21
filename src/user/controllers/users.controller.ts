@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseBoolPipe,
   ParseIntPipe,
@@ -32,16 +34,25 @@ export default class UsersController {
   @Get(':id')
   @UsePipes(new ValidationPipe())
   getUser(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
-    return res.json(this.userService.getUser(id));
+    const user = this.userService.getUser(id);
+    if (user == null) {
+      throw new HttpException('user not found', HttpStatus.OK);
+    }
+
+    return res.json(user);
   }
 
   @Post()
   @UsePipes(new ValidationPipe())
   createUser(@Body() newUser: CreateUserDto, @Res() res: Response) {
-    this.userService.createUser({
+    const user = this.userService.createUser({
       id: newUser.id,
       username: newUser.username,
     });
+
+    if (!user) {
+      throw new HttpException('Could not create user', HttpStatus.OK);
+    }
 
     return res.json({
       message: 'Created',

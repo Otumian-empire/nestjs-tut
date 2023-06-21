@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import CreateUserDto from '../dtos/create_user.dto';
-import ReadUserByIdDto from '../dtos/read_user_by_id.dto';
 
 @Injectable()
 export default class UserService {
@@ -14,10 +13,20 @@ export default class UserService {
   }
 
   getUser(id: number) {
-    return this.users[id];
+    if (id < this.users.length) return this.users[id];
+    return null;
   }
 
   createUser(data: CreateUserDto) {
+    const userExists = this.users.filter(
+      (row) => row.id === data.id || row.username === data.username,
+    );
+
+    if (userExists.length > 0) {
+      return false;
+    }
+
     this.users.push(data);
+    return true;
   }
 }
