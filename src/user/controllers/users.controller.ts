@@ -15,6 +15,8 @@ import { Response } from 'express';
 
 import CreateUserDto from '../dtos/create_user.dto';
 import UserService from '../services/users.service';
+import { CreateUserTransformPipe } from '../pipes/create_user_transform.pipe';
+import { CreateUserValidationPipe } from '../pipes/create_user_validation.pipe';
 
 @Controller('users')
 export default class UsersController {
@@ -37,7 +39,27 @@ export default class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  createUser(@Body() newUser: CreateUserDto, @Res() res: Response) {
+  createUser(
+    @Body(CreateUserTransformPipe) newUser: CreateUserDto,
+    @Res() res: Response,
+  ) {
+    this.userService.createUser({
+      id: newUser.id,
+      username: newUser.username,
+    });
+
+    return res.json({
+      message: 'Created',
+      users: this.userService.getUsers(false),
+    });
+  }
+
+  @Post('validation-pipe')
+  @UsePipes(new CreateUserValidationPipe())
+  createUserWithValidationPipe(
+    @Body() newUser: CreateUserDto,
+    @Res() res: Response,
+  ) {
     this.userService.createUser({
       id: newUser.id,
       username: newUser.username,
